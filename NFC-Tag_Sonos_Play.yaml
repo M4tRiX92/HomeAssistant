@@ -1,5 +1,5 @@
 blueprint:
-  name: NFC Tag plays Music
+  name: NFC-Tag Sonos Steuerung
   description: "Steuere die Wiedergabe auf einem Sonos-Lautsprecher mit NFC-Tags."
   domain: automation
   input:
