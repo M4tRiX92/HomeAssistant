@@ -1,21 +1,6 @@
 blueprint:
-  name: "NFC-Tag plays Music"
-  description: >
-    # 💡 NFC-Tag plays Music
-    **Version: 0.1**
-    With this blueprint, you can select which music should be played when an NFC tag is scanned. ✨
-    **If you like my blueprints, and would like to show your support or just say thank you?** [Click Here](https://www.paypal.com/donate/?hosted_button_id=Y33CF7RUEEFF4) Thank you!
-    <details>
-    <summary><b>The Automation Process:</b> 👈</summary>
-      - **Prerequisites:**
-        - *Create a new helper [input_text] input_text.last_scanned_tag "Last scanned Tag" (Value: 100 char)
-        -  *Create a new helper [counter] counter.last_radio_index "Last Played Radio Index" (Value: e.g. 0-4 (depends on how many radios in the list you want)
-      - **Trigger:**
-        - You can choose any in HomeAssistant registered NFC tag to trigger the automation.
-      - **Configuration:**
-        - You can select a Spotify-Playlist or use the Home-Assistant integrated RadioBrowser
-    </details>
-    Required = *
+  name: NFC Tag plays Music
+  description: "Steuere die Wiedergabe auf einem Sonos-Lautsprecher mit NFC-Tags."
   domain: automation
   input:
     tag_id:
