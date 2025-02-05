@@ -2,27 +2,17 @@ blueprint:
   name: NFC-Tag Sonos Steuerung
   description: >
     # 💡 NFC-Tag plays Music
+    
     **Version: 0.1**
     With this blueprint, you can select which music should be played when an NFC tag is scanned. ✨
-    **If you like my blueprints and would like to show your support or just say thank you,** [Click Here](https://www.paypal.com/donate/?hosted_button_id=Y33CF7RUEEFF4). Thank you!
-    <details>
-    <summary><b>The Automation Process:</b> 👈</summary>
-      - **Prerequisites:**
-        - *Create a new helper [input_text] `input_text.last_scanned_tag` ("Last scanned Tag", Value: max. 100 chars)
-        - *Create a new helper [counter] `counter.last_radio_index` ("Last Played Radio Index", Value: e.g. 0-4, depending on how many radios you want)
-      - **Trigger:**
-        - You can choose any NFC tag registered in Home Assistant to trigger the automation.
-      - **Configuration:**
-        - You can select a Spotify playlist or use the Home Assistant integrated RadioBrowser.
-    </details>
+
   domain: automation
   input:
     tag_id:
       name: NFC-Tag ID
       description: "The ID of the NFC tag that triggers this automation."
       selector:
-        entity:
-          domain: tag
+        tag:
 
     media_player:
       name: Speakers
@@ -51,14 +41,67 @@ blueprint:
 
     is_radio:
       name: More than one Radio station?
-      description: "If activated, the system switches through a channel list. (Only relevant if 'Internet-Radio' is selected)"
+      description: "If activated, the system switches through a channel list."
       default: false
       selector:
         boolean:
 
     stations:
       name: Radio station list
-      description: "List of radio stream URLs (Only relevant if 'Internet-Radio' is selected and multiple stations are desired)."
+      description: "List of radio stream URLs (only relevant for Internet-Radio)."
       default: []
       selector:
-        object:
+        list:
+          items:
+            type: string
+
+trigger:
+  - platform: tag
+    tag_id: !input tag_id
+
+action:
+  - choose:
+      - conditions:
+          - condition: template
+            value_template: "{{ states('input_text.last_scanned_tag') == tag_id }}"
+          - condition: state
+            entity_id: !input media_player
+            state: playing
+        sequence:
+          - service: media_player.media_next_track
+            target:
+              entity_id: !input media_player
+    default:
+      - service: input_text.set_value
+        data:
+          entity_id: input_text.last_scanned_tag
+          value: !input tag_id
+
+      - if:
+          - condition: template
+            value_template: "{{ is_radio }}"
+        then:
+          - service: counter.increment
+            entity_id: counter.last_radio_index
+        else:
+          - service: counter.reset
+            entity_id: counter.last_radio_index
+
+      - variables:
+          station_index: "{{ (states('counter.last_radio_index') | int) % (stations | length) }}"
+          station_url: "{{ stations[station_index] if is_radio else media_content_id }}"
+
+      - service: media_player.volume_set
+        target:
+          entity_id: !input media_player
+        data:
+          volume_level: 0.1
+
+      - service: media_player.play_media
+        target:
+          entity_id: !input media_player
+        data:
+          media_content_id: "{{ station_url }}"
+          media_content_type: "{{ 'music' if is_radio else media_content_type }}"
+
+mode: restart
