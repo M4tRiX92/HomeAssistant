@@ -36,18 +36,12 @@ blueprint:
       default: false
       selector:
         boolean:
-      conditions:
-        - condition: template
-          value_template: "{{ media_content_type == 'music' }}"
     stations:
       name: Radiosenderliste
       description: "Liste der Radiostream-URLs, wenn 'Ist Radio' aktiviert ist."
       default: []
       selector:
         object:
-      conditions:
-        - condition: template
-          value_template: "{{ media_content_type == 'music' }}"
 
 automation:
   trigger:
@@ -58,7 +52,7 @@ automation:
     - choose:
         - conditions:
             - condition: template
-              value_template: "{{ states('input_text.last_scanned_tag') == trigger_tag }}"
+              value_template: "{{ states('input_text.last_scanned_tag') == tag_id }}"
           sequence:
             - if:
                 - condition: template
