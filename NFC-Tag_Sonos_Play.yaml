@@ -1,28 +1,46 @@
 blueprint:
   name: NFC-Tag Sonos Steuerung
-  description: "Steuere die Wiedergabe auf einem Sonos-Lautsprecher mit NFC-Tags."
+  description: >
+    # 💡 NFC-Tag plays Music
+    **Version: 0.1**
+    With this blueprint, you can select which music should be played when an NFC tag is scanned. ✨
+    **If you like my blueprints and would like to show your support or just say thank you,** [Click Here](https://www.paypal.com/donate/?hosted_button_id=Y33CF7RUEEFF4). Thank you!
+    <details>
+    <summary><b>The Automation Process:</b> 👈</summary>
+      - **Prerequisites:**
+        - *Create a new helper [input_text] input_text.last_scanned_tag "Last scanned Tag" (Value: 100 char)
+        - *Create a new helper [counter] counter.last_radio_index "Last Played Radio Index" (Value: e.g. 0-4 depending on how many radios you want in the list)
+      - **Trigger:**
+        - You can choose any NFC tag registered in Home Assistant to trigger the automation.
+      - **Configuration:**
+        - You can select a Spotify playlist or use the Home Assistant integrated RadioBrowser.
+    </details>
+    Required = *
   domain: automation
   input:
     tag_id:
       name: NFC-Tag ID
-      description: "Die ID des NFC-Tags, das diese Automation auslöst."
+      description: "The ID of the NFC tag that triggers this automation."
       selector:
         entity:
           domain: tag
+      required: true
     media_player:
-      name: Sonos Lautsprecher
-      description: "Der zu steuernde Sonos-Lautsprecher."
+      name: Speakers
+      description: "The speakers to be controlled."
       selector:
         entity:
           domain: media_player
+          multiple: true
+      required: true
     media_content_id:
-      name: Medieninhalt
-      description: "Die Spotify-Playlist oder der Radiosender, der abgespielt werden soll."
+      name: Media content
+      description: "The Spotify playlist or the radio station to be played."
       selector:
         text:
     media_content_type:
-      name: Medieninhaltstyp
-      description: "Typ des abzuspielenden Inhalts."
+      name: Media content type
+      description: "Type of content to be played."
       selector:
         select:
           options:
@@ -30,68 +48,30 @@ blueprint:
               value: "spotify"
             - label: "Internet-Radio"
               value: "music"
+      required: true
     is_radio:
-      name: Ist Radio
-      description: "Falls aktiviert, wird durch eine Senderliste gewechselt."
+      name: More than one Radio station?
+      description: "If activated, the system switches through a channel list."
       default: false
       selector:
         boolean:
+          conditional:
+            conditions:
+              - condition: select
+                entity_id: !input media_content_type
+                state: "music"
+            fields:
+              - required: true
     stations:
-      name: Radiosenderliste
-      description: "Liste der Radiostream-URLs, wenn 'Ist Radio' aktiviert ist."
+      name: Radio station list
+      description: "List of radio stream URLs if 'List' is activated."
       default: []
       selector:
         object:
-
-automation:
-  trigger:
-    - platform: tag
-      tag_id: !input tag_id
-
-  action:
-    - choose:
-        - conditions:
-            - condition: template
-              value_template: "{{ states('input_text.last_scanned_tag') == tag_id }}"
-          sequence:
-            - if:
-                - condition: template
-                  value_template: "{{ is_radio }}"
-              then:
-                - service: counter.increment
-                  entity_id: counter.last_radio_index
-            - else:
-                - service: media_player.media_next_track
-                  target:
-                    entity_id: !input media_player
-      default:
-        - if:
-            - condition: template
-              value_template: "{{ is_radio }}"
-          then:
-            - service: counter.reset
-              entity_id: counter.last_radio_index
-        
-        - service: input_text.set_value
-          data:
-            entity_id: input_text.last_scanned_tag
-            value: !input tag_id
-
-        - variables:
-            station_index: "{{ (states('counter.last_radio_index') | int) % (stations | length) }}"
-            station_url: "{{ stations[station_index] if is_radio else media_content_id }}"
-
-        - service: media_player.volume_set
-          target:
-            entity_id: !input media_player
-          data:
-            volume_level: 0.1
-
-        - service: media_player.play_media
-          target:
-            entity_id: !input media_player
-          data:
-            media_content_id: "{{ station_url }}"
-            media_content_type: "{{ 'music' if is_radio else media_content_type }}"
-
-  mode: restart
+          conditional:
+            conditions:
+              - condition: select
+                entity_id: !input media_content_type
+                state: "music"
+            fields:
+              - required: true
