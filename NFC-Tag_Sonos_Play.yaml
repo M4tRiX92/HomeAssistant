@@ -3,7 +3,7 @@ blueprint:
   description: >
     # 💡 NFC-Tag plays Music
     
-    **Version: 0.1**
+    **Version: 0.2**
     With this blueprint, you can select which music should be played when an NFC tag is scanned. ✨
 
   domain: automation
@@ -12,7 +12,7 @@ blueprint:
       name: NFC-Tag ID
       description: "The ID of the NFC tag that triggers this automation."
       selector:
-        tag:
+        text:
 
     media_player:
       name: Speakers
@@ -51,9 +51,7 @@ blueprint:
       description: "List of radio stream URLs (only relevant for Internet-Radio)."
       default: []
       selector:
-        list:
-          items:
-            type: string
+        object:
 
 trigger:
   - platform: tag
