@@ -1,9 +1,9 @@
 blueprint:
-  name: NFC-Tag plays Music
+  name: "NFC-Tag plays Music"
   description: >
     # 💡 NFC-Tag plays Music
     **Version: 0.1**
-   With this blueprint, you can select which music should be played when an NFC tag is scanned. ✨
+    With this blueprint, you can select which music should be played when an NFC tag is scanned. ✨
     **If you like my blueprints, and would like to show your support or just say thank you?** [Click Here](https://www.paypal.com/donate/?hosted_button_id=Y33CF7RUEEFF4) Thank you!
     <details>
     <summary><b>The Automation Process:</b> 👈</summary>
