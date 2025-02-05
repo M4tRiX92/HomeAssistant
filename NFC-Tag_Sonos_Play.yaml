@@ -8,14 +8,13 @@ blueprint:
     <details>
     <summary><b>The Automation Process:</b> 👈</summary>
       - **Prerequisites:**
-        - *Create a new helper [input_text] input_text.last_scanned_tag "Last scanned Tag" (Value: 100 char)
-        - *Create a new helper [counter] counter.last_radio_index "Last Played Radio Index" (Value: e.g. 0-4 depending on how many radios you want in the list)
+        - *Create a new helper [input_text] `input_text.last_scanned_tag` ("Last scanned Tag", Value: max. 100 chars)
+        - *Create a new helper [counter] `counter.last_radio_index` ("Last Played Radio Index", Value: e.g. 0-4, depending on how many radios you want)
       - **Trigger:**
         - You can choose any NFC tag registered in Home Assistant to trigger the automation.
       - **Configuration:**
         - You can select a Spotify playlist or use the Home Assistant integrated RadioBrowser.
     </details>
-    Required = *
   domain: automation
   input:
     tag_id:
@@ -24,20 +23,21 @@ blueprint:
       selector:
         entity:
           domain: tag
-      required: true
+
     media_player:
       name: Speakers
-      description: "The speakers to be controlled."
+      description: "The speakers to be controlled. You can select multiple."
       selector:
         entity:
           domain: media_player
           multiple: true
-      required: true
+
     media_content_id:
       name: Media content
       description: "The Spotify playlist or the radio station to be played."
       selector:
         text:
+
     media_content_type:
       name: Media content type
       description: "Type of content to be played."
@@ -48,30 +48,17 @@ blueprint:
               value: "spotify"
             - label: "Internet-Radio"
               value: "music"
-      required: true
+
     is_radio:
       name: More than one Radio station?
-      description: "If activated, the system switches through a channel list."
+      description: "If activated, the system switches through a channel list. (Only relevant if 'Internet-Radio' is selected)"
       default: false
       selector:
         boolean:
-          conditional:
-            conditions:
-              - condition: select
-                entity_id: !input media_content_type
-                state: "music"
-            fields:
-              - required: true
+
     stations:
       name: Radio station list
-      description: "List of radio stream URLs if 'List' is activated."
+      description: "List of radio stream URLs (Only relevant if 'Internet-Radio' is selected and multiple stations are desired)."
       default: []
       selector:
         object:
-          conditional:
-            conditions:
-              - condition: select
-                entity_id: !input media_content_type
-                state: "music"
-            fields:
-              - required: true
